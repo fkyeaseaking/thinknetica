@@ -24,23 +24,17 @@ class Station
 end
 
 class Route
-  attr_reader :first_station, :stations
+  attr_reader :stations
 
   def initialize(first_station, last_station)
-    @first_station = first_station
-    @last_station = last_station
-    @stations = []
-    @stations << first_station << last_station
-    @way_stations = []
+    @stations = [first_station, last_station]
   end
 
-  def add_way_station(station)
-    @way_stations << station
+  def add_station(station)
     @stations.insert(@stations.size - 1, station)
   end
 
-  def remove_way_station(station)
-    @stations.delete(station) if @way_stations.include?(station)
+  def remove_station(station)
     @way_stations.delete(station)
   end
 
@@ -51,7 +45,7 @@ end
 
 class Train
   attr_accessor :speed, :route
-  attr_reader   :cars_count, :current_station, :next_station, :previous_station, :type, :number
+  attr_reader   :cars_count, :next_station, :previous_station, :type, :number
 
   def initialize(number, type, cars_count)
     @number = number
@@ -82,31 +76,26 @@ class Train
 
   def set_route(route)
     @route = route
-    @current_station = route.first_station
-    @current_station.add_train(self)
+    @current_station_index = 0
   end
 
   def next_station
-    return @current_station if @current_station == @route.stations.last
-    index = @route.stations.find_index(@current_station)
-    @next_station = @route.stations[index+1]
+    @route.stations[@current_station_index + 1]
   end
 
   def previous_station
-    return @current_station if @current_station == @route.stations.first
-    index = @route.stations.find_index(@current_station)
-    @previous_station = @route.stations[index-1]
+    @route.stations[@current_station_index + 1]
   end
 
   def move_up
-    @current_station.send_train(self)
-    @current_station = next_station
-    @current_station.add_train(self)
+    @stations[current_station_index].send_train(self)
+    @current_station_index += 1 if @current_station_index < @route.stations
+    @stations[current_station_index].add_train(self)
   end
 
   def move_down
-    @current_station.send_train(self)
-    @current_station = previous_station
-    @current_station.add_train(self)
+    @stations[current_station_index].send_train(self)
+    @current_station_index -= 1 if @current_station_index > 0
+    @stations[current_station_index].add_train(self)
   end
 end
