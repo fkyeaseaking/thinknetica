@@ -1,32 +1,27 @@
 class RailWay
-  attr_reader :stations, :routes, :train_cars, :trains
+  attr_reader :stations, :routes, :carriages, :trains
 
   def initialize
     @stations = []
     @routes = []
-    @train_cars = []
+    @carriages = []
     @trains = []
   end
 
+  MENU = [
+    { keyword: "create", description: "create station, route, car or train" },
+    { keyword: "manage", description: "manage existing object" },
+    { keyword: "info", description: "get info about object" },]
+
   def menu
     loop do
-      puts "Enter 'create' to create station, route, car or train"
-      puts "Enter 'manage' to manage existing object"
-      puts "Enter 'info' to get info about object"
+      MENU.each { |item| puts "Enter '#{item[:keyword]}' to #{item[:description]}" }
       exit_tip
 
       input = gets.chomp.downcase
+      break if input == "exit"
 
-      case input
-      when "create"
-        create_menu
-      when "manage"
-        manage_menu
-      when "info"
-        info_menu
-      when "exit"
-        break
-      end
+      sub_menu(input)
 
       dividing_line
     end
@@ -34,64 +29,14 @@ class RailWay
 
   private
 
-  def create_menu
+  def sub_menu(type)
     type_of_object_tip
     exit_tip
 
     input = gets.chomp.downcase
-
-    case input
-    when "station"
-      create_station_menu
-    when "route"
-      create_route_menu
-    when "car"
-      create_car_menu
-    when "train"
-      create_train_menu
-    when "exit"
-      self.menu
-    end
-  end
-
-  def manage_menu
-    type_of_object_tip
-    exit_tip
-
-    input = gets.chomp.downcase
-
-    case input
-    when "station"
-      manage_station_menu
-    when "route"
-      manage_route_menu
-    when "car"
-      manage_car_menu
-    when "train"
-      manage_train_menu
-    when "exit"
-      self.menu
-    end
-  end
-
-  def info_menu
-    type_of_object_tip
-    exit_tip
-
-    input = gets.chomp.downcase
-
-    case input
-    when "station"
-      info_station_menu
-    when "route"
-      info_route_menu
-    when "car"
-      info_car_menu
-    when "train"
-      info_train_menu
-    when "exit"
-      self.menu
-    end
+    exit_check(input)
+    result_menu = "#{type}_" + input + "_menu"
+    send(result_menu)
   end
 
   def create_station_menu
@@ -127,21 +72,21 @@ class RailWay
     dividing_line
   end
 
-  def create_car_menu
-    puts "Enter train car type ('cargo', 'passenger'):"
+  def create_carriage_menu
+    puts "Enter train carriage type ('cargo', 'passenger'):"
     exit_tip
 
     type = gets.chomp.downcase
     exit_check(type)
 
     if type == "cargo"
-      car = CargoCar.new
-      @cars << car
-      car_created_tip
+      carriage = CargoCarriage.new
+      @carriages << carriage
+      carriage_created_tip
     elsif type == "passenger"
-      car = PassengerCar.new
-      @cars << car
-      car_created_tip
+      carriage = PassengerCarriage.new
+      @carriages << carriage
+      carriage_created_tip
     else
       wrong_type_tip
       dividing_line
@@ -205,7 +150,7 @@ class RailWay
       station.add_train(train)
     when "send train"
       puts "Trains on station:"
-      station.display_trains
+      station.trains { |train| puts train.number }
 
       train_number = gets.chomp.to_i
       train = find_train(train_number)
@@ -241,7 +186,7 @@ class RailWay
       dividing_line
     when "remove station"
       puts "Route's stations"
-      route.display_stations
+      route.stations.each { |station| puts station.name }
 
       puts "Enter station name:"
       station_name = gets.chomp
@@ -252,15 +197,15 @@ class RailWay
     end
   end
 
-  def manage_car_menu
-    puts "Select [number] train car to delete:"
+  def manage_carriage_menu
+    puts "Select [number] train carriage to delete:"
     display_cars
     exit_tip
 
     index = get_index
-    @train_cars.delete(@train_cars[index])
+    @carriages.delete(@carriages[index])
     
-    puts "Train car deleted"
+    puts "Train carriage deleted"
     dividing_line
   end
 
@@ -275,7 +220,7 @@ class RailWay
     train_number = train_number.to_i
     train = find_train(train_number)
 
-    puts "Select action('set route', 'add car', 'remove car', 'move up', 'move down'):"
+    puts "Select action('set route', 'add carriage', 'remove carriage', 'move up', 'move down'):"
     exit_tip
 
     input = gets.chomp.downcase
@@ -293,25 +238,25 @@ class RailWay
       train.set_route(@routes[index])
       "Route has been set"
       dividing_line
-    when "add car"
-      puts "Train cars:"
-      display_cars
+    when "add carriage"
+      puts "Train cariages:"
+      display_carriages
       exit_tip
 
       index = get_index
-      train.add_car(@train_cars[index])
+      train.add_carriage(@carriages[index])
 
-      puts "Car has been added"
+      puts "Carriage has been added"
       dividing_line
-    when "remove car"
-      puts "#{train.number} Train cars:"
-      train.cars.each_with_index { |car, index| puts "[#{index}] #{car}" }
+    when "remove carriage"
+      puts "#{train.number} Train carriages:"
+      train.carriages.each_with_index { |car, index| puts "[#{index}] #{car}" }
       exit_tip
 
       index = get_index
-      train.remove_car(@train_cars[index])
+      train.remove_carriage(@carriages[index])
 
-      puts "Car has been removed"
+      puts "Carriage has been removed"
       dividing_line
     when "move up"
       train.move_up
@@ -351,17 +296,17 @@ class RailWay
     dividing_line
   end
 
-  def info_car_menu
-    puts "Select car [number] (enter 'all' for all routes list):"
-    display_cars
+  def info_carriage_menu
+    puts "Select carriage [number] (enter 'all' for all routes list):"
+    display_carriages
     exit_tip
 
     index = gets.chomp
-    puts @train_cars if index.downcase == "all" 
+    puts @carriages if index.downcase == "all" 
     exit_check(index)
     index = index.to_i
     
-    puts @train_cars[index]
+    puts @carriages[index]
     dividing_line
   end
 
@@ -406,8 +351,8 @@ class RailWay
     @routes.each_with_index { |route, index| puts "[#{index}] #{route.stations.first.name} - #{route.stations.last.name}" }
   end
 
-  def display_cars
-    @train_cars.each_with_index { |car, index| puts "[#{index}] #{car}" }
+  def display_carriagess
+    @carriages.each_with_index { |car, index| puts "[#{index}] #{car}" }
   end
 
   def get_index
@@ -417,11 +362,11 @@ class RailWay
   end
 
   def type_of_object_tip
-    puts "Enter type of object ('station', 'route', 'car', 'train')"
+    puts "Enter type of object ('station', 'route', 'carriage', 'train')"
   end
 
-  def car_created_tip
-    puts "Train car has been created"
+  def carriage_created_tip
+    puts "Train carriage has been created"
     dividing_line
   end
 

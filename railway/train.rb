@@ -5,30 +5,30 @@ class Train
   def initialize(number)
     @number = number
     @speed = 0
-    @cars = []
+    @carriages = []
   end
 
   def stop
     self.speed = 0
   end
 
-  def add_car(car)
-    if speed.zero? && car.type == self.type
-      @cars << car
-    elsif speed.zero? && car.type != self.type
+  def add_carriage(carriage)
+    if speed.zero? && carriage.type == self.type
+      @carriages << carriage
+    elsif speed.zero? && carriage.type != self.type
       puts "Wrong car type"
-    elsif @cars.include?(car)
+    elsif @carriages.include?(carriage)
       puts "Car already added to this train"
     else
-      puts "Can't add car on the run"
+      puts "Can't add carriage on the run"
     end
   end
 
-  def remove_car(car)
+  def remove_carriage(carriage)
     if speed.zero?
-      @cars.delete(car)
+      @carriages.delete(carriage)
     else
-      puts "Can't remove car on the run"
+      puts "Can't remove carriage on the run"
     end
   end
 
