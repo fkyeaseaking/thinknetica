@@ -7,10 +7,10 @@ class Station
   end
 
   def add_train(train)
-    @trains << train
+    trains << train
   end
 
   def send_train(train)
-    @trains.delete(train)
+    trains.delete(train)
   end
 end
