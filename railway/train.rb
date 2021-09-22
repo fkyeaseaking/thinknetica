@@ -1,11 +1,27 @@
+require_relative "company_mixin.rb"
+require_relative "instance_counter.rb"
+
 class Train
+  include CompanyMixin
+  include InstanceCounter
+
   attr_accessor :speed, :route, :cars
   attr_reader   :cars_count, :type, :number
+
+  init_instances
 
   def initialize(number)
     @number = number
     @speed = 0
     @carriages = []
+    register_instance
+  end
+
+  def self.find(number)
+    ObjectSpace.each_object(self).to_a.each do |train|
+      return train if train.number == number
+    end
+    nil
   end
 
   def stop
