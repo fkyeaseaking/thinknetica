@@ -7,14 +7,17 @@ class Station
 
   init_instances
 
+  @@stations = []
+
   def initialize(name)
     @name = name
     @trains = []
     register_instance
+    @@stations << self
   end
 
   def self.all
-    ObjectSpace.each_object(self).to_a
+    @@stations
   end
 
   def add_train(train)

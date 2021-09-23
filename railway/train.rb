@@ -10,17 +10,18 @@ class Train
 
   init_instances
 
+  @@trains = []
+
   def initialize(number)
     @number = number
     @speed = 0
     @carriages = []
     register_instance
+    @@trains << self
   end
 
   def self.find(number)
-    ObjectSpace.each_object(self).to_a.each do |train|
-      return train if train.number == number
-    end
+    @@trains.each { |train| return train if train.number == number }
     nil
   end
 
