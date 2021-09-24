@@ -103,7 +103,7 @@ class RailWay
     puts "Enter train number:"
     exit_tip
 
-    number = gets.chomp.to_i
+    number = gets.chomp
     exit_check(number)
 
     if type == "cargo"
@@ -118,6 +118,11 @@ class RailWay
       wrong_type_tip
       dividing_line
     end
+
+  rescue RuntimeError => e
+    puts "ERROR: #{e.message}"
+    dividing_line
+    retry
   end
 
   def manage_station_menu

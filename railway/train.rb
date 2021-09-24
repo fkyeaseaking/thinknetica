@@ -1,19 +1,30 @@
 require_relative "company_mixin.rb"
 require_relative "instance_counter.rb"
+require_relative "validation_check_mixin.rb"
 
 class Train
   include CompanyMixin
   include InstanceCounter
+  include ValidationCheckMixin
 
   attr_accessor :speed, :route, :cars
   attr_reader   :cars_count, :type, :number
 
   init_instances
 
+  ERRORS = {
+    empty_number: "Number can not be empty",
+    wrong_number_format: "Wrong number format",
+    too_short: "At least 5 characters"
+  }
+
+  NUMBER_FORMAT = /^\w{3}(-)?\w{2}$/i
+
   @@trains = []
 
   def initialize(number)
     @number = number
+    validate!
     @speed = 0
     @carriages = []
     register_instance
@@ -67,6 +78,13 @@ class Train
   end
 
   private
+
+  def validate!
+    raise ERRORS[:empty_number] if number.empty?
+    raise ERRORS[:too_short] if number.length < 5
+    raise ERRORS[:wrong_number_format] if number !~ NUMBER_FORMAT
+    true
+  end
 
   def next_station
     route.stations[@current_station_index + 1]
