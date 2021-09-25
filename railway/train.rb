@@ -80,10 +80,13 @@ class Train
   private
 
   def validate!
-    raise ERRORS[:empty_number] if number.empty?
-    raise ERRORS[:too_short] if number.length < 5
-    raise ERRORS[:wrong_number_format] if number !~ NUMBER_FORMAT
-    true
+    errors = []
+
+    errors << ERRORS[:empty_number] if number.empty?
+    errors <<  ERRORS[:too_short] if number.length < 5
+    errors << ERRORS[:wrong_number_format] if number !~ NUMBER_FORMAT
+
+    raise errors.join(".") unless errors.blank?
   end
 
   def next_station
