@@ -8,7 +8,7 @@ class Train
   include ValidationCheckMixin
 
   attr_accessor :speed, :route, :cars
-  attr_reader   :cars_count, :type, :number
+  attr_reader   :cars_count, :type, :number, :carriages
 
   init_instances
 
@@ -77,6 +77,10 @@ class Train
     route.stations[current_station_index].add_train(self)
   end
 
+  def all_carriages(&block)
+    block_given? ? carriages.each { |carriage| yield(carriage) } : carriage
+  end
+
   private
 
   def validate!
@@ -86,7 +90,7 @@ class Train
     errors <<  ERRORS[:too_short] if number.length < 5
     errors << ERRORS[:wrong_number_format] if number !~ NUMBER_FORMAT
 
-    raise errors.join(".") unless errors.blank?
+    raise errors.join(".") unless errors.empty?
   end
 
   def next_station

@@ -80,17 +80,33 @@ class RailWay
     exit_check(type)
 
     if type == "cargo"
-      carriage = CargoCarriage.new
+      puts "Enter max capacity"
+      exit_tip
+
+      capacity = gets.chomp.downcase
+      exit_check(capacity)
+
+      carriage = CargoCarriage.new(capacity.to_i)
       @carriages << carriage
       carriage_created_tip
     elsif type == "passenger"
-      carriage = PassengerCarriage.new
+      puts "Enter seats amount"
+      exit_tip
+
+      amount = gets.chomp.downcase
+      exit_check(amount)
+
+      carriage = PassengerCarriage.new(amount.to_i)
       @carriages << carriage
       carriage_created_tip
     else
       wrong_type_tip
       dividing_line
     end
+  rescue RuntimeError => e
+    puts "ERROR: #{e.message}"
+    dividing_line
+    retry
   end
 
   def create_train_menu
@@ -203,15 +219,44 @@ class RailWay
   end
 
   def manage_carriage_menu
-    puts "Select [number] train carriage to delete:"
+    puts "Select [number] train carriage to to manage:"
     display_cars
     exit_tip
 
     index = get_index
-    @carriages.delete(@carriages[index])
-    
-    puts "Train carriage deleted"
+    carriage = @carriages[index]
+
+    puts "Select action ('delete', 'add')"
+    exit_tip
+
+    action = gets.chomp.downcase
+    exit_check(action)
+
+    case action
+    when "delete"
+      @carriages.delete(carriage)
+      
+      puts "Train carriage deleted"
+      dividing_line
+    when "add"
+      case carriage.type
+      when :passenger
+        carriage.add_passenger
+        puts "Passenger added"
+        dividing_line
+      when :cargo
+        puts "Enter voulume"
+
+        volume = gets.chomp.to_i
+        carriage.add_cargo(volume)
+        puts "Volume added"
+        dividing_line
+      end
+    end
+  rescue RuntimeError => e
+    puts "ERROR: #{e.message}"
     dividing_line
+    retry
   end
 
   def manage_train_menu
@@ -281,7 +326,7 @@ class RailWay
 
     station_name = gets.chomp
     exit_check(station_name)
-    puts @stations if station_name.downcase == "all"
+    all_station_info if station_name.downcase == "all"
 
     puts find_station(station_name)
     dividing_line
@@ -302,7 +347,7 @@ class RailWay
   end
 
   def info_carriage_menu
-    puts "Select carriage [number] (enter 'all' for all routes list):"
+    puts "Select carriage [number] (enter 'all' for all carriages list):"
     display_carriages
     exit_tip
 
@@ -311,7 +356,7 @@ class RailWay
     exit_check(index)
     index = index.to_i
     
-    puts @carriages[index]
+    carriage_info(@carriages[index])
     dividing_line
   end
 
@@ -322,9 +367,9 @@ class RailWay
 
     train_number = gets.chomp
     exit_check(train_number)
-    puts @trains if train_name.downcase == "all"
+    all_trains_info if train_name.downcase == "all"
 
-    puts find_station(train_name)
+    puts train_info(find_train(train_number))
     dividing_line
   end
 
@@ -364,6 +409,30 @@ class RailWay
     index = gets.chomp
     exit_check(index)
     index = index.to_i
+  end
+
+  def all_trains_info
+    @trains.each do |train|
+      train.all_carriages { |car| carriage_info(car) }
+    end
+  end
+
+  def all_station_info
+    @station.each do |station|
+      station.all_trains { |train| train_info(train) }
+    end
+  end
+
+  def carriage_info(car)
+    if car.type == :cargo
+      puts "Number: #{car.number}, space left: #{car.space_left}, cargo volume: #{car.cargo_volume}"
+    elsif car.type == :passenger
+      puts "Number: #{car.number}, free seats left: #{car.free_seats}, seats taken: #{car.seats_taken}"
+    end
+  end
+
+  def train_info(train)
+    puts "Number: #{train.number}, type: #{train.type}, carriages amount: #{train.carriages.count}"
   end
 
   def type_of_object_tip

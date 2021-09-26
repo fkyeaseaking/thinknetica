@@ -27,6 +27,10 @@ class Station
     @@stations
   end
 
+  def all_trains(&block)
+    block_given? ? trains.each { |train| yield(train) } : trains
+  end
+
   def add_train(train)
     trains << train
   end
