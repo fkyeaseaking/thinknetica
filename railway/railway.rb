@@ -424,11 +424,7 @@ class RailWay
   end
 
   def carriage_info(car)
-    if car.type == :cargo
-      puts "Number: #{car.number}, space left: #{car.space_left}, cargo volume: #{car.cargo_volume}"
-    elsif car.type == :passenger
-      puts "Number: #{car.number}, free seats left: #{car.free_seats}, seats taken: #{car.seats_taken}"
-    end
+    puts "Number: #{car.number}, free place: #{car.free_space}, max place: #{car.place}"
   end
 
   def train_info(train)

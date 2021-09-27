@@ -1,22 +1,14 @@
 class CargoCarriage < Carriage
-  attr_reader :cargo_volume
-
-  def initialize(capacity)
+  def initialize
     super
-    @capacity = capacity
     @type = :cargo
-    @cargo_volume = 0
   end
 
-  def add_cargo(volume)
-    if space_left < volume
+  def add_cargo(amount)
+    if used_place < amount
       raise ERRORS[:not_enough_space]
     else
-      cargo_volume += volume
+      place += amount
     end
-  end
-
-  def space_left
-    capacity - cargo_volume
   end
 end
