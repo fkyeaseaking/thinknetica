@@ -1,6 +1,5 @@
-require_relative "instance_counter.rb"
-require_relative "validation_check_mixin.rb"
-
+require_relative "instance_counter"
+require_relative "validation_check_mixin"
 
 class Route
   include InstanceCounter
@@ -10,7 +9,7 @@ class Route
 
   ERRORS = {
     invalid_station: "Invalid station"
-  }
+  }.freeze
 
   init_instances
 
@@ -30,7 +29,7 @@ class Route
   end
 
   private
-  
+
   def validate!
     stations.each { |station| raise ERRORS[:invalid_station] if station.class != Station }
     true

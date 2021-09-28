@@ -1,5 +1,5 @@
-require_relative "instance_counter.rb"
-require_relative "validation_check_mixin.rb"
+require_relative "instance_counter"
+require_relative "validation_check_mixin"
 
 class Station
   include InstanceCounter
@@ -9,7 +9,7 @@ class Station
 
   ERRORS = {
     empty_name: "Name can not be empty"
-  }
+  }.freeze
 
   init_instances
 
@@ -27,8 +27,8 @@ class Station
     @@stations
   end
 
-  def all_trains(&block)
-    block_given? ? trains.each { |train| yield(train) } : trains
+  def all_trains
+    block_given? ? trains.each(&block) : trains
   end
 
   def add_train(train)
@@ -43,6 +43,7 @@ class Station
 
   def validate!
     raise ERRORS[:empty_name] if name.empty?
+
     true
   end
 end

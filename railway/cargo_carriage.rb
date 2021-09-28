@@ -5,10 +5,8 @@ class CargoCarriage < Carriage
   end
 
   def add_cargo(amount)
-    if used_place < amount
-      raise ERRORS[:not_enough_space]
-    else
-      place += amount
-    end
+    raise ERRORS[:not_enough_space] if used_place < amount
+
+    used_place += amount
   end
 end

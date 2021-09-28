@@ -1,6 +1,6 @@
-require_relative "company_mixin.rb"
-require_relative "instance_counter.rb"
-require_relative "validation_check_mixin.rb"
+require_relative "company_mixin"
+require_relative "instance_counter"
+require_relative "validation_check_mixin"
 
 class Train
   include CompanyMixin
@@ -16,9 +16,9 @@ class Train
     empty_number: "Number can not be empty",
     wrong_number_format: "Wrong number format",
     too_short: "At least 5 characters"
-  }
+  }.freeze
 
-  NUMBER_FORMAT = /^\w{3}(-)?\w{2}$/i
+  NUMBER_FORMAT = /^\w{3}(-)?\w{2}$/i.freeze
 
   @@trains = []
 
@@ -41,9 +41,9 @@ class Train
   end
 
   def add_carriage(carriage)
-    if speed.zero? && carriage.type == self.type
+    if speed.zero? && carriage.type == type
       carriages << carriage
-    elsif speed.zero? && carriage.type != self.type
+    elsif speed.zero? && carriage.type != type
       puts "Wrong car type"
     elsif carriages.include?(carriage)
       puts "Car already added to this train"
@@ -73,12 +73,12 @@ class Train
 
   def move_down
     route.stations[current_station_index].send_train(self)
-    current_station_index -= 1 if @current_station_index > 0
+    current_station_index -= 1 if @current_station_index.positive?
     route.stations[current_station_index].add_train(self)
   end
 
-  def all_carriages(&block)
-    block_given? ? carriages.each { |carriage| yield(carriage) } : carriage
+  def all_carriages
+    block_given? ? carriages.each(&block) : carriage
   end
 
   private
@@ -87,7 +87,7 @@ class Train
     errors = []
 
     errors << ERRORS[:empty_number] if number.empty?
-    errors <<  ERRORS[:too_short] if number.length < 5
+    errors << ERRORS[:too_short] if number.length < 5
     errors << ERRORS[:wrong_number_format] if number !~ NUMBER_FORMAT
 
     raise errors.join(".") unless errors.empty?

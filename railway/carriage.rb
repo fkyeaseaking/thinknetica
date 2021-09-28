@@ -1,4 +1,4 @@
-require_relative "company_mixin.rb"
+require_relative "company_mixin"
 
 class Carriage
   include CompanyMixin
@@ -9,7 +9,7 @@ class Carriage
   ERRORS = {
     all_seats_taken: "All seats taken",
     not_enough_space: "Not enough space"
-  }
+  }.freeze
 
   def initialize(place)
     @place = place
