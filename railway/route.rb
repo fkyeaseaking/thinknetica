@@ -1,11 +1,13 @@
 require_relative "instance_counter"
 require_relative "validation_check_mixin"
+require_relative "accessors_mixin"
 
 class Route
   include InstanceCounter
   include ValidationCheckMixin
+  extend Accessors
 
-  attr_reader :stations
+  attr_accessor_with_history :stations
 
   ERRORS = {
     invalid_station: "Invalid station"

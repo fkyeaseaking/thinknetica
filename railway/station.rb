@@ -1,15 +1,16 @@
 require_relative "instance_counter"
-require_relative "validation_check_mixin"
+require_relative "accessors_mixin"
+require_relative "validation_mixin"
 
 class Station
   include InstanceCounter
-  include ValidationCheckMixin
+  include Validation
+  extend Accessors
 
-  attr_reader :name, :trains
-
-  ERRORS = {
-    empty_name: "Name can not be empty"
-  }.freeze
+  attr_accessor_with_history :trains
+  strong_attr_accessor :name, String
+  validate :name, :presence
+  validate :name, :type, String
 
   init_instances
 
@@ -37,13 +38,5 @@ class Station
 
   def send_train(train)
     trains.delete(train)
-  end
-
-  private
-
-  def validate!
-    raise ERRORS[:empty_name] if name.empty?
-
-    true
   end
 end

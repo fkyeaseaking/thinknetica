@@ -1,10 +1,15 @@
 require_relative "company_mixin"
+require_relative "accessors_mixin"
+require_relative "validation_mixin"
 
 class Carriage
   include CompanyMixin
+  include Validation
+  extend Accessors
 
-  attr_reader :type, :place, :used_place
-  attr_accessor :number
+  attr_reader :type
+  attr_accessor_with_history :number, :place, :used_place
+  validate :place, :type, Integer
 
   ERRORS = {
     all_seats_taken: "All seats taken",
@@ -15,6 +20,7 @@ class Carriage
     @place = place
     @used_place = 0
     @number = rand(1..1000)
+    validate!
   end
 
   def free_place

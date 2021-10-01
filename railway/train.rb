@@ -1,34 +1,30 @@
 require_relative "company_mixin"
 require_relative "instance_counter"
-require_relative "validation_check_mixin"
+require_relative "accessors_mixin"
+require_relative "validation_mixin"
 
 class Train
   include CompanyMixin
   include InstanceCounter
-  include ValidationCheckMixin
-
-  attr_accessor :speed, :route, :cars
-  attr_reader   :cars_count, :type, :number, :carriages
-
-  init_instances
-
-  ERRORS = {
-    empty_number: "Number can not be empty",
-    wrong_number_format: "Wrong number format",
-    too_short: "At least 5 characters"
-  }.freeze
+  include Validation
+  extend Accessors
 
   NUMBER_FORMAT = /^\w{3}(-)?\w{2}$/i.freeze
+
+  init_instances
+  attr_accessor_with_history :speed, :route, :cars, :cars_count, :type, :number, :carriages
+  validate :number, :format, NUMBER_FORMAT
+  validate :number, :presence
 
   @@trains = []
 
   def initialize(number)
     @number = number
-    validate!
     @speed = 0
     @carriages = []
     register_instance
     @@trains << self
+    validate!
   end
 
   def self.find(number)
@@ -82,16 +78,6 @@ class Train
   end
 
   private
-
-  def validate!
-    errors = []
-
-    errors << ERRORS[:empty_number] if number.empty?
-    errors << ERRORS[:too_short] if number.length < 5
-    errors << ERRORS[:wrong_number_format] if number !~ NUMBER_FORMAT
-
-    raise errors.join(".") unless errors.empty?
-  end
 
   def next_station
     route.stations[@current_station_index + 1]
